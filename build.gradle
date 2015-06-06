@@ -1,0 +1,56 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'war'
+apply plugin: 'org.akhikhl.gretty'
+
+
+buildscript{
+
+	repositories{
+		jcenter()
+	}
+	dependencies{
+		classpath "org.akhikhl.gretty:gretty:$gretty_version"
+	}
+}
+
+// application option
+mainClassName ='com.sds.redca.core.engine.Starter'
+installApp.doLast {
+		ant.copy(file: '' + project(':redca-common').projectDir +'/script/redca-schema-install.sql' , todir: ''+installApp.destinationDir+'/script' )
+}
+
+
+// ###### OPTIONS ########
+// compile option 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8' // compileGroovy, compileTestGroovy
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+    runtime group: 'org.apache.derby', name: 'derbyclient', version: derby_version
+    runtime group: 'org.apache.derby', name: 'derbynet', version: derby_version
+	runtime 'com.h2database:h2:1.3.163'
+}
+
+
+configurations.all { 
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.name == 'log4j') {
+            details.useTarget 'log4j:log4j:1.2.+'
+        }
+    }
+} 
+
+gretty {
+	  servletContainer = 'jetty8'
+	  servicePort = 8209
+	  port = 8200
+	  contextPath = '/derby'
+	  jvmArgs = ['-Dderby.system.home=./sundayDB']
+}
+ 

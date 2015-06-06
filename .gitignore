@@ -1,0 +1,10 @@
+/bin
+
+build
+/build
+.settings
+.gradle
+redcaDB
+/redcaDB
+/redca-admin
+/RedcaAdminDB
